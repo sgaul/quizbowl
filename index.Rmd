@@ -1,0 +1,887 @@
+---
+title       : Know.  Your.  Region.
+subtitle    : Indicators quizbowl
+author      : 
+job         : Community Indicators Project
+framework   : io2012        # {io2012, html5slides, shower, dzslides, minimal ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [bootstrap, quiz]
+assets      : {js: 'test.js'}
+ext_widgets : {rCharts: ["libraries/nvd3"]} 
+mode        : selfcontained # {standalone, draft}
+
+--- &twocol
+## Outline of indicators
+
+*** =left
+Background on the region
+* Population / diversity
+* Commuting patterns
+* School enrollment
+* Income levels and poverty rates
+
+Education
+* 3rd grade reading
+* High school graduation rate
+* Chronic absenteeism
+
+*** =right
+Jobs
+* Educational attainment
+* Unemployment rate
+* Job growth
+
+Quality of life / civic health
+* Affordable housing
+* Crime rate
+* Voter turnout
+
+---
+## Key themes so far
+
+1. 'We are a region'
+2. Concentration of poverty in Hartford
+3. Suburbanization of poverty
+4. Aging population and workforce
+5. Globally connected region
+6. Achievement gap and talent pipeline
+7. Creating opportunity in communities in the region?
+
+---
+## Current partners
+
+1. Capital Workforce Partners
+2. Capitol Region Council of Governments
+3. Hartford Foundation for Public Giving
+4. Hispanic Health Council
+4. MetroHartford Alliance
+6. Opportunities Hartford (City of Hartford)
+7. Trinity Center for Urban and Global Studies
+8. Urban League of Greater Hartford
+9. United Way of Central and Northeastern Connecticut
+
+--- &twocol
+## Region: CRCOG towns (Hartford + 29 towns)
+
+*** =left
+Urban periphery
+* Bloomfield, East Hartford, Enfield, Manchester, Newington, Rocky Hill, Vernon, West Hartford, Wethersfield, Windsor, Windsor Locks
+
+*** =right
+Suburban / rural 
+* Andover, Avon, Bolton, Canton, East Granby, East Windsor, Ellington, Farmington, Glastonbury, Granby, Hebron, Marlborough, Simsbury, Somers, South Windsor, Suffield, Stafford, Tolland
+
+--- &radio
+
+## Population growth ##
+
+What has been the population change in West Hartford since 1970?
+
+1. _-7%_
+2. 7%
+3. 14%
+4. 28%
+
+*** .hint
+
+In 1970, the population of West Hartford was 68,031. 
+
+*** .explanation
+
+It has gone from 68K to 63K. The projected population in 2025 is just under 63K.  
+
+---
+## Low population growth
+ 
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 12}
+library(ggplot2)
+library(scales)
+library(reshape)
+
+gh <- read.csv("../regionalreport/data/greaterhartford.csv")
+gh$poppoverty <- round((gh$poppovertyrate / 100) * gh$population,0)
+gh_test <- ddply(merge(gh,towns,by.x = "city", by.y = "Town"),
+                 .(period,Towngroup), summarise, 
+                 sumpop = sum(population),
+                 sumpoor = sum(poppoverty))
+
+ggplot() + 
+  geom_line(data = subset(gh_test, period >= 1900 & period <= 2010), size = 1, 
+            aes(x = period, y = sumpop, group = Towngroup, colour = Towngroup)) + 
+  geom_line(data = subset(gh_test, period >= 2010), linetype = 'dotted', size = 1,
+            aes(x = period, y = sumpop, group = Towngroup, colour = Towngroup)) + 
+  theme_minimal(base_size = 16) + 
+  scale_y_continuous(labels = comma, lim = c(0,500000)) +  
+  labs(x = "Year", y = "Population")
+```
+
+--- &radio
+
+## Poverty ##
+
+Fewer people lived in poverty in Hartford in 2000 than in 1990. Is this good news or bad news? Explain your answer. 
+
+1. Good news
+2. _Bad news_
+
+*** .hint
+
+37,000 people lived in poverty in Hartford by 2000. 
+
+*** .explanation
+
+During this period, population loss was faster than the increase in poverty. Poverty thus became more concentrated in the city during this decade - many people left the city, some of them poor. The current poverty rate for the city is 38 percent, among the highest in the country. 
+
+--- 
+## Suburbanization of poverty
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 12}
+gh <- merge(gh,towns, by.x = "city", by.y = "Town")
+
+gh_sum <- ddply(gh,.(Towngroup, period), summarise, population = sum(population), population.under.poverty = sum(poppoverty))
+
+ggplot(aes(y = population.under.poverty, 
+           x = period), data = subset(gh_sum,period >= 1970)) + 
+  geom_line(aes(group = Towngroup, colour = Towngroup), size = 1) + 
+  scale_y_continuous(labels = comma, limits = c(0,41000)) + 
+  labs(x = "Year", y = 'Population') +
+  theme_minimal(base_size = 16)
+```
+
+---
+## Aging population
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 12}
+library(ggplot2)
+library(scales)
+library(reshape)
+projections <- read.csv('../reviewversion/sdc-projections.csv')
+towns <- read.csv("../regionalreport/data/hartford-towns.csv")
+projections <- subset(projections, projections$TOWN %in% levels(towns$Town))
+projections$TOWN <- factor(projections$TOWN)
+projections$YEAR <- paste("20",projections$YEAR, sep = "")
+
+projections <- merge(projections, towns, by.x = "TOWN", by.y = "Town")
+
+levels(projections$AGE) <- list(
+  "55 years and over" = c("8084","6064","7579","5559","90OV","7074","8589","6569"),
+  "25 to 54 years" = c("4549","2529","4044","3539","5054","3034"),
+  "16 to 24 years" = c("2024","1519"),
+  "0 to 16 years" = c("0004","0509","1014","4","509"))
+
+#projections$TYPE = ifelse(projections$TOWN == "Hartford","Hartford","Other region")
+
+#aging <- ddply(projections, .(YEAR, AGE, GENDER, TYPE), summarise, sum = sum(value))
+#aging <- cast(aging, TYPE + YEAR + AGE ~ GENDER)
+
+#levels(aging$AGE) <- rev(levels(aging$AGE))
+
+projections$AGE <- factor(projections$AGE, levels = c("0 to 16 years",
+                                                      "16 to 24 years",
+                                                      "25 to 54 years",
+                                                      "55 years and over"))
+
+projections$Towngroup <- factor(projections$Towngroup, levels = c("Hartford",
+                                                                  "Urban periphery",
+                                                                  "Suburban / rural"))
+
+ggplot(data = 
+         ddply(projections, .(YEAR, AGE, Towngroup), summarise, value = sum(value)),
+       aes(x = YEAR, y = value)) + 
+  geom_line(aes(group = AGE, colour = AGE), size = 1, linetype = 'dotted') +
+  geom_point(aes(group = AGE, colour = AGE, shape = AGE)) +
+  facet_wrap(~ Towngroup, ncol = 3) +
+  scale_fill_brewer(name = "Age") +
+  scale_y_continuous(labels = comma) + 
+  labs(y = "Population", x = "Year") +
+  theme_minimal(base_size = 16)
+```
+
+--- &radio
+
+## School enrollment ##
+
+What proportion of area students go to school outside their 'home' district?
+
+1. 1 in 20
+2. 1 in 10
+3. _1 in 6_
+4. 1 in 5
+5. 1 in 4
+
+*** .hint
+
+This includes charter schools, magnet schools, private and parochial schools, home-schooling, vocational schools, etc. 
+
+*** .explanation
+
+16% (or 1 in 6) of students in the region attend school outside their home district, either through magnets, charters, open choice, private schools or other alternatives. However, there is substantial variation across the towns in the region.   
+
+--- 
+## School enrollment declining
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 14}
+enroll <- read.csv("../regionalreport/data/all-schools.csv", stringsAsFactors=FALSE)
+
+#Filter out the towns that are not in the region and clear out the factors
+enroll <- subset(enroll, enroll$Resident.Town %in% levels(towns$Town))
+enroll$Resident.Town <- factor(enroll$Resident.Town)
+
+charters <- data.frame(charters = c("The Bridge Academy District",
+                            "Trailblazers Academy District",
+                            "Side By Side Community School District",
+                            "Park City Prep Charter School",
+                            "Odyssey Community School District",
+                            "New Beginnings Inc., Family Academy District",
+                            "Jumoke Academy District",
+                            "Highville Charter School District",  
+                            "Highville Mustard Seed Charter School District",       
+                            "Integrated Day Charter School District",        
+                            "Interdistrict School for Arts and Comm District",
+                            "Explorations District",
+                            "Elm City College Preparatory School",
+                            "Common Ground High School District",
+                            "Charter School for Young Children on Asylum Hill",
+                            "Bridgeport Achievement First",
+                            "Achievement First Hartford Academy Inc.",                
+                            "Amistad Academy District"))
+
+#Make the charters into their own category
+enroll$School.Type[enroll$Sent.to.District %in% levels(charters[,])] <- 'Public charter'
+
+#Replace the less frequent school types with 'Other'
+enroll$School.Type <- gsub("Homebound","Other",enroll$School.Type)
+enroll$School.Type <- gsub("Voag","Other",enroll$School.Type)
+enroll$School.Type <- gsub("Interdistrict Cooperative Agreement","Other",enroll$School.Type)
+enroll$School.Type <- gsub("Designated High School","Other",enroll$School.Type)
+enroll$School.Type <- gsub("Nonpublic","Private",enroll$School.Type)
+
+#Melt the dataset to get it into a more normalized format for plotting
+enroll <- melt(enroll, 
+               measure.vars = c("PK","K","G1","G2","G3","G4","G5","G6","G7","G8","G9","G10","G11","G12","Total"),
+               id.vars = c("Resident.Town.ID","District.ID","Resident.Town","Sent.to.District","School.Year","School.Type"))
+
+#Get rid of the sent to districts since there are multiple districts for each
+enroll <- aggregate(enroll$value,
+                    list(Resident.Town = enroll$Resident.Town, 
+                         School.Year = enroll$School.Year, 
+                         School.Type = enroll$School.Type, 
+                         variable = enroll$variable), 
+                    sum)
+
+#Sort the school types for the display
+enroll$School.Type <- factor(enroll$School.Type, levels = c("Public",
+                                                            "Private",
+                                                            "Public charter",
+                                                            "Magnet School",
+                                                            "Open Choice","Other"))
+
+ggplot(data = ddply(merge(subset(enroll, variable == "Total"), towns, 
+                          by.x = "Resident.Town",by.y = "Town"),
+      .(Towngroup, School.Type, School.Year),summarise, x = sum(x)),
+       aes(x = School.Year, y = x, group = School.Type, fill = School.Type)) +
+  geom_line(aes(group = School.Type, colour = School.Type)) +
+  geom_point(aes(group = School.Type, colour = School.Type, shape = School.Type)) +
+  scale_y_continuous(labels = comma) +
+  scale_x_discrete(breaks = c("2006-07","2008-09","2010-11")) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 16) +
+  facet_wrap(~ Towngroup, ncol = 3)
+
+#write.csv(enrollflow, "enrollflow.csv", row.names = FALSE)
+#Next command: write.csv(subset(otm, ratio > 0.05 & !(Destination == "All Other Locations")), "commute.csv", row.names = FALSE)
+```
+
+--- &radio
+
+## Linguistic diversity ##
+
+Which school district has the most languages spoken by its students?
+
+1. East Hartford
+2. Hartford
+3. Rocky Hill
+4. _West Hartford_
+5. Wethersfield
+
+*** .hint
+
+46 languages are spoken in this district (2010-11 data). 
+
+*** .explanation
+
+West Hartford has the most languages, followed by Hartford. Hartford has the highest percentage of ELL students though.  
+
+--- 
+## A diverse population
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 12}
+library(gridExtra)
+library(scales)
+languages <- read.csv('../reviewversion/Languages-all.csv', na.strings = c("**","-"))
+districts <- read.csv("../regionalreport/data/hartford-districts.csv")
+languages <- merge(languages, districts, by.x = "District.Name", by.y = "district")
+
+languages_agg <- merge(ddply(languages, .(District.Name), summarise,all.lang = length(unique(Languages)),all.students = sum(Number.of.Students.with.Non.English.Home.Language, na.rm = TRUE)),
+                       ddply(subset(languages, Number.of.ELL.Students > 0),
+                             .(District.Name), summarise,ell.lang = length(unique(Languages)),ell.students = sum(Number.of.ELL.Students, na.rm = TRUE)),
+                       by = "District.Name", 
+                       all = TRUE)
+
+#All linguistic diversity
+languages_agg$District.Name <- reorder(languages_agg$District.Name,
+                                       languages_agg$all.lang)
+
+ggplot(data = languages_agg) + 
+  geom_point(aes(x = all.lang, y = District.Name)) + 
+  labs(x = 'Number of languages spoken, all students', y = NULL) + 
+  scale_x_continuous(labels = comma) + 
+  theme_minimal(base_size = 16)
+```
+
+--- &radio
+
+## Globally connected region ##
+
+Which of the following is _not_ among the top 5 languages spoken in Hartford Public Schools?
+
+1. Albanian
+2. _Creole-Haitian_
+3. Karen
+4. Portuguese
+5. Serbo-Croatian
+
+*** .hint
+
+Spanish is the most frequently spoken language. 
+
+*** .explanation
+
+The top languages in HPS are: Spanish, Serbo-Croatian (Bosnian), Karen, Albanian, Portuguese and Somali (for all students and ELL students).  
+
+--- 
+## Refugee arrivals
+
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 12}
+refugees <- read.csv('../mockup/Arrivals by Destination and Natoinality.csv')
+refugees <- subset(refugees, refugees$textbox12City %in% levels(towns$Town))
+refugees$textbox12City <- factor(refugees$textbox12City)
+
+refugees$textbox14 <- gsub(pattern = "CY ",replacement = "",refugees$textbox14)
+
+refugees$TownType = ifelse(refugees$textbox12City == "Hartford","Hartford","Suburbs")
+
+refugees_agg <- ddply(refugees, .(TownType, textbox6, textbox14), summarise,
+                      count = sum(textbox18))
+
+ggplot(data = subset(refugees_agg, textbox6 %in% c('Bhutan',
+                                                   'Bosnia and Herzegovina',
+                                                   'Burma',
+                                                   'Burundi',
+                                                   'Cuba',
+                                                   'Iraq',
+                                                   'Liberia',
+                                                   'Russia',
+                                                   'Somalia',
+                                                   'Serbia')), 
+       aes(x = textbox14, y = count)) + 
+  geom_line(aes(group = TownType, colour = TownType)) + 
+  facet_wrap(~ textbox6, ncol = 2) + 
+  theme_minimal(base_size = 16) + 
+  labs(x = 'Year', y = 'Number of arrivals')
+```
+
+--- &radio
+
+## Workforce skills ##
+
+Connecticut is forecasted to need what percent middle-skills workers by 2020?
+
+1. 18%
+2. _28%_
+3. 38%
+4. 48%
+
+*** .hint
+
+30% of jobs are forecasted to be low-skills jobs. 
+
+*** .explanation
+
+The Center for Education and the Workforce at Georgetown forecasts CT jobs to requires 30% low skills (no college), 28% middle skills (some college or credential) and 42% high skills (college or higher). Job growth is forecasted to occur by roughly the same percentages. 
+
+--- 
+## Meeting demands for a skilled workforce
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 13}
+library(acs)
+library(maps)
+library(maptools)
+key = "ba67d3a427e1f785987b9c8bc59341bf7c8a7cc1"
+api.key.install(key)
+
+crcog.towns = geo.make(state = "CT", 
+                       county = paste(towns$County,"County"),
+                       county.subdivision = paste(towns$Town,"town"), 
+                       check = F, 
+                       combine = T,
+                       combine.term = "CRCOG region")
+
+C15002I = acs.fetch(geography = crcog.towns, table.number = "C15002I", col.names = "pretty")
+C15002B = acs.fetch(geography = crcog.towns, table.number = "C15002B", col.names = "pretty")
+C15002H = acs.fetch(geography = crcog.towns, table.number = "C15002H", col.names = "pretty")
+
+attainment.by.race = 
+  rbind(data.frame(town=geography(C15002I)[[1]],
+                 race = "Hispanic / Latino",
+                 nohs=as.numeric(estimate(divide.acs(
+                   numerator=(C15002I[,3] + C15002I[,8]),
+                   denominator=(C15002I[,1])))),
+                 hs=as.numeric(estimate(divide.acs(
+                   numerator=(C15002I[,4] + C15002I[,9]),
+                   denominator=(C15002I[,1])))),
+                 somecollege=as.numeric(estimate(divide.acs(
+                   numerator=(C15002I[,5] + C15002I[,10]),
+                   denominator=(C15002I[,1])))),
+                 college=as.numeric(estimate(divide.acs(
+                   numerator=(C15002I[,6] + C15002I[,11]),
+                   denominator=(C15002I[,1]))))),
+        data.frame(town=geography(C15002B)[[1]],
+                 race = "Black",
+                 nohs=as.numeric(estimate(divide.acs(
+                   numerator=(C15002B[,3] + C15002B[,8]),
+                   denominator=(C15002B[,1])))),
+                 hs=as.numeric(estimate(divide.acs(
+                   numerator=(C15002B[,4] + C15002B[,9]),
+                   denominator=(C15002B[,1])))),
+                 somecollege=as.numeric(estimate(divide.acs(
+                   numerator=(C15002B[,5] + C15002B[,10]),
+                   denominator=(C15002B[,1])))),
+                 college=as.numeric(estimate(divide.acs(
+                   numerator=(C15002B[,6] + C15002B[,11]),
+                   denominator=(C15002B[,1]))))),
+      data.frame(town=geography(C15002H)[[1]],
+                 race = "White",
+                 nohs=as.numeric(estimate(divide.acs(
+                   numerator=(C15002H[,3] + C15002H[,8]),
+                   denominator=(C15002H[,1])))),
+                 hs=as.numeric(estimate(divide.acs(
+                   numerator=(C15002H[,4] + C15002H[,9]),
+                   denominator=(C15002H[,1])))),
+                 somecollege=as.numeric(estimate(divide.acs(
+                   numerator=(C15002H[,5] + C15002H[,10]),
+                   denominator=(C15002H[,1])))),
+                 college=as.numeric(estimate(divide.acs(
+                   numerator=(C15002H[,6] + C15002H[,11]),
+                   denominator=(C15002H[,1]))))))
+
+attainment.by.race <- melt(attainment.by.race)
+
+ggplot(data = attainment.by.race, 
+       aes(y = value, x = race, group = race, fill = variable)) + 
+  geom_bar(position = 'fill', stat = 'identity') + 
+  scale_y_continuous(labels = percent) +
+  labs(x = NULL, y = '% of adults (2008 - 2012 ACS estimates)') +
+  scale_fill_brewer(labels = c("Less than high school degree",
+                               "High school graduate",
+                               "Some college or associate's degree",
+                               "Bachelor's degree or higher"), 
+                    name = "") +
+  coord_flip() + 
+  theme_minimal(base_size = 16)
+```
+
+
+--- 
+## Talent pipeline from schools
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 11}
+hsgrad <- read.csv("../hsgraduation/hsgraduationrates-district.csv")
+
+#Filter to just regional districts
+districts <- read.csv("../regionalreport/data/hartford-districts.csv")
+hsgrad <- subset(hsgrad, hsgrad$District.Name %in% levels(districts$district))
+hsgrad$District.Name <- factor(hsgrad$District.Name)
+
+#Clean up categories
+hsgrad$Category <- gsub(pattern = "^Indian$", replacement = "American Indian", hsgrad$Category)
+hsgrad$Category <- gsub(pattern = "Asian American", replacement = "Asian", hsgrad$Category)
+hsgrad$Category <- gsub(pattern = "Asian ", replacement = "Asian", hsgrad$Category)
+hsgrad$Category <- gsub(pattern = "Non- Special", replacement = "Non-Special", hsgrad$Category)
+
+#Merge with enrollment data to allow aggregation
+#Doing this with entire enrollment for the school, need better data by year
+hsenroll <- read.csv("../hsgraduation/Race_and_Gender_by_district_2011_for_N_5_suppressed.csv")
+hsenroll <- melt(hsenroll, id.vars = c("Inst","dist","District.Name"))
+hsenroll$variable <- gsub(pattern = "All.Students", replacement = "All Students", hsenroll$variable)
+
+gradenroll <- merge(hsgrad, hsenroll, by.x = c("District.Name","Category"), by.y = c("District.Name","variable"))
+
+#Show trends for region
+gradregion <- ddply(gradenroll, .(Category), summarise, 
+                    wm = weighted.mean(X4.Year.Graduation.Rate, value, na.rm = TRUE))
+
+gradregion$Category <- reorder(gradregion$Category, gradregion$wm)
+
+ggplot(data = subset(gradregion, !(Category %in% c("American Indian")))) + 
+  geom_point(aes(x = Category, y = wm)) + 
+  coord_flip() + 
+  ylim(0,100) +
+  theme_minimal(base_size = 16) + 
+  labs(x = NULL, y = "Average four-year graduation rate by major subgroup (2010 - 2011)")
+```
+
+
+--- &radio
+
+## Jobs ##
+
+How many people commute into Hartford from other towns for work?
+
+1. 46,000
+2. 66,000
+3. 86,000
+4. _106,000_
+5. 156,000
+
+*** .hint
+
+Hartford has (roughly) 121,000 jobs within city limits.   
+
+*** .explanation
+
+106,000 workers commute into Hartford from the region outside (most from 'Greater Hartford'). 15,000 Hartford residents work in Hartford; 28,000 Hartford residents are employed outside Hartford.
+
+--- 
+## Everyone commutes, mostly to Hartford
+
+![image](../mockup/commute-patterns.png)
+
+--- &radio
+
+## Jobs ##
+
+Which sector had the fastest job growth in the last 10 years in Greater Hartford?
+
+1. Construction
+2. Finance and Insurance
+3. _Healthcare & Social Assistance_
+4. Manufacturing
+5. Retail Trade
+
+*** .hint
+
+Only one of these sectors had positive job growth in the last 10 years. 
+
+*** .explanation
+
+Healthcare and social assistance was the fastest growing; finance and insurance, manufacturing and construction were the three slowest growing sectors over the same period. 
+
+--- 
+## What kind of jobs are there?
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 13}
+qcew <- read.csv('../mockup/qcewannual-t.csv')
+
+qcew <- rbind(qcew,
+              ddply(subset(qcew,naicsector > 100), .(area,series,year), summarise,
+                    naicsector = 31,
+                    sectortitle = "Manufacturing",
+                    value = sum(value)))
+
+jobgrowth <- cast(subset(qcew, series == "Employees" &
+                           area == "North Central" &
+                           naicsector < 100 & 
+                           year %in% c(2013, 2003)),
+                  sectortitle ~ year)
+names(jobgrowth) <- make.names(names(jobgrowth))
+jobgrowth$growth = jobgrowth$X2013 / jobgrowth$X2003 - 1
+
+jobgrowth$sectortitle <- reorder(jobgrowth$sectortitle, jobgrowth$growth)
+
+ggplot(data = subset(jobgrowth, X2013 > 1000 & 
+                       sectortitle != "Total - All Industries"), 
+       aes(x = growth, y = sectortitle)) + 
+  geom_point(aes(size = X2013)) +
+  theme_minimal(base_size = 16) +
+  scale_size(name = "Number of\n employees (2013)") + 
+  labs(x = "Growth (2010 - 2013)", y = "Sector") +
+  scale_x_continuous(labels = percent)
+```
+
+--- &radio
+
+## 3rd grade reading ##
+
+What percent of ELL students in the region were at or above goal for 3rd grade reading (from 2005 - 2011)?
+
+1. 5%
+2. _9%_
+3. 14%
+4. 25%
+5. 34%
+
+*** .hint
+
+65% of non-ELL students were at or above goal.  
+
+*** .explanation
+
+8.96% of ELL students were at or above goal on 3rd grade reading tests from 2006 - 2011.
+
+--- 
+## 3rd grade reading as a milestone
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 14}
+cmt_subgroups <- read.csv('../testscores/cmt-subgroups.csv', na.strings = c("**","-"))
+districts <- read.csv("../regionalreport/data/hartford-districts.csv")
+cmt_subgroups <- subset(cmt_subgroups, cmt_subgroups$District.ID %in% 
+                     levels(as.factor(districts$districtid)))
+
+#Clean up race categories - make compatible with old categories
+cmt_subgroups$Status = gsub(x = cmt_subgroups$Status, 
+                                pattern = "American Indian/Alaska Native",
+                                replacement = "American Indian")
+
+cmt_subgroups$Status = gsub(x = cmt_subgroups$Status, 
+                                pattern = "Black/African American",
+                                replacement = "Black, not of Hispanic Origin")
+
+cmt_subgroups$Status = gsub(x = cmt_subgroups$Status, 
+                                pattern = "(White$)",
+                                replacement = "White, not of Hispanic Origin")
+
+cmt_subgroups <- subset(cmt_subgroups, Students.Tested > 0)
+
+cmt_subgroups_region <- ddply(cmt_subgroups,.(School.Year, Subgroup, Status),
+                              summarise,
+                              Percent.at.or.Above.Goal = weighted.mean(Percent.at.or.Above.Goal, Students.Tested, na.rm = TRUE),
+                              Average.Scale.Score = weighted.mean(Average.Scale.Score, Students.Tested, na.rm = TRUE))
+#Show trends for the region
+ggplot(data = cmt_subgroups_region, aes(x = School.Year, y = Average.Scale.Score)) + 
+  geom_line(aes(group = Status)) + 
+#  geom_point(aes(group = Status)) + 
+  facet_wrap(~ Subgroup, ncol = 5) + 
+  scale_x_discrete(breaks = c("2005-06","2009-2010")) + 
+  theme_minimal(base_size = 16) + 
+  labs(x = "School Year", y = "Average scale score, 3rd grade reading")
+```
+
+--- &radio
+
+## Chronic absenteeism ##
+
+Which of the following districts had a chronic absenteeism rate over 10% in 2012?
+
+1. Bloomfield
+2. East Hartford
+3. _Somers_
+4. West Hartford
+5. Windsor Locks
+
+*** .hint
+
+Chronic absenteeism is the percent of students missing over 10% of days during the school year. The average for the region is about 8 percent.  
+
+*** .explanation
+
+Somers had a rate of 14.3% for 2012. 
+
+--- 
+## Chronic absenteeism another early warning sign
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 11}
+absenteeism <- read.csv("../hodgepodge/CT_ChronicAbsenteeism_2012_SDE-1.csv")
+districts <- read.csv("../regionalreport/data/hartford-districts.csv")
+absenteeism <- subset(absenteeism, absenteeism$District.Number %in% levels(as.factor(districts$districtid)))
+absenteeism$District <- reorder(absenteeism$District, absenteeism$Students.Chronically.Absent.in.District..Total)
+
+ggplot(data = absenteeism, aes(x = Students.Chronically.Absent.in.District..Total, 
+                               y = District)) + 
+  geom_point() + 
+  theme_minimal(base_size = 16) +
+  labs(x = "% students chronically absent (2012)", y = NULL)
+```
+
+--- &radio
+
+## Home ownership ##
+
+Which neighborhood has the highest homeownership rate (owner-occupied housing) in Hartford?
+
+1. Behind the Rocks
+2. Blue Hills
+3. _Southwest_
+4. West End
+
+*** .hint
+
+About 65% of units are owner-occupied in this neighborhood.
+
+*** .explanation
+
+Southwest has the highest home ownership rate in the city, followed by Blue Hills. These are the only two neighborhoods in which a majority of housing units are owner-occupied.
+
+--- 
+## Home ownership sign of civic health
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 11}
+library(acs)
+library(maps)
+library(maptools)
+key = "ba67d3a427e1f785987b9c8bc59341bf7c8a7cc1"
+api.key.install(key)
+hartford.tracts = geo.make(state = "CT", county = c("Hartford","Tolland"), tract = "*", check = F)
+B25008 = acs.fetch(geography = hartford.tracts, table.number = "B25008", col.names = "pretty", year = 2012)
+own.estimate = divide.acs(numerator=B25008[,2],denominator=B25008[,1], method = 'proportion')
+homeownership.tract = data.frame(tract=geography(B25008)[[1]], 
+                         rate=as.numeric(estimate(own.estimate)),
+                         se=standard.error(own.estimate))
+names(homeownership.tract) <- c("tract","rate","se")
+
+homeownership.tract$tract= gsub("Census Tract ", "", homeownership.tract$tract)
+homeownership.tract$tract= gsub(", Tolland County, Connecticut", "",
+                                homeownership.tract$tract)
+homeownership.tract$tract= gsub(", Hartford County, Connecticut", "", 
+                                homeownership.tract$tract)
+
+#Load the UConn tract and town-level shapefiles
+CTTracts <- readShapeSpatial(fn="../tractct_37800_0000_2010_s100_census_1_shp/wgs84/tractct_37800_0000_2010_s100_census_1_shp_wgs84")
+CTTracts <- fortify(CTTracts, region = "NAME10")
+CTTracts <- CTTracts[order(CTTracts$order),]
+#Load the UConn shapefile
+CTTowns <- readShapeSpatial(fn="../townshp/wgs84/townct_37800_0000_2010_s100_census_1_shp_wgs84")
+#Fortify and order the CTTowns to allow ggmap to use that
+CTTowns <- fortify(CTTowns, region = "NAME10")
+CTTowns <- CTTowns[order(CTTowns$order),]
+#Merge with data
+library(classInt)
+jenks <- classIntervals(homeownership.tract$rate, 
+                        n=4, style="fisher")
+choropleth=merge(CTTracts, homeownership.tract, by.x = "id", by.y="tract")
+choropleth=choropleth[order(choropleth$order), ]
+choropleth$rate=cut(choropleth$rate, 
+                          breaks=jenks$brks,
+                          include.lowest=T, dig.lab = T)
+#Make the map
+ggplot(data = choropleth, aes(long, lat, group = group)) +
+  geom_polygon(aes(fill = rate)) + 
+  scale_x_continuous(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = NULL, y = NULL) + 
+  coord_equal() +
+  geom_polygon(data = CTTowns, colour = "grey", alpha = 0.1, fill = NA) +
+  scale_fill_brewer(palette = "Purples", name = "Home ownership\nrate") +
+  theme_minimal(base_size = 16)
+```
+
+--- 
+## Affordable housing stock in the region
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 11}
+appeals <- read.csv('../housingcost/appeals-list-2012.csv')
+
+#appeals <- subset(appeals, appeals$Town %in% levels(towns$Town))
+
+#appeals <- merge(appeals,towns, by = "Town")
+
+appeals <- merge(appeals, subset(gh, period == 2010), by.x = "Town", by.y = "city")
+
+appeals$Town <- reorder(appeals$Town, appeals$Percent.Affordable)
+
+ggplot(data = appeals, aes(x = Percent.Affordable, y = Town)) + 
+  geom_point() + 
+  geom_vline(xintercept = 0.1) + 
+  scale_x_continuous(labels = percent) + 
+  theme_minimal(base_size = 16) +
+  labs(x = "% affordable housing units") 
+```
+
+--- &radio
+
+## Crime rates ##
+
+Which Connecticut city has the highest crime rates (all crime)?
+
+1. Bridgeport
+2. Hartford
+3. New Britain
+4. _New Haven_
+5. Stamford
+6. Waterbury
+
+*** .hint
+
+It's not Stamford.
+
+*** .explanation
+
+Crime rates have been dropping nationally and have dropped in Hartford in recent years. However, most of the recent decline has been a drop in property crime and violent crime rates have not declined in recent years.
+
+--- 
+## 'Hartford safest in 30 years'
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 11}
+totalcrime <- read.csv("../crime/totalcrime.csv")
+ggplot(data = subset(totalcrime[!is.na(totalcrime$Total.crime.Rate),], 
+                     Town %in% c("Bridgeport","Hartford","New Haven","New Britain","Stamford","Waterbury")), 
+       aes(x = as.numeric(Year), y = Total.crime.Rate)) + 
+  geom_line(aes(group = Town, colour = Town), size = 1) +
+  geom_point(aes(group = Town, colour = Town)) +
+  labs(x = NULL, y = "Crime rate by town (per 100K residents)") +
+  scale_x_continuous(breaks = c(1998,2004,2010)) + 
+  theme_minimal(base_size = 16)
+```
+
+--- &radio
+
+## Voter turnout ##
+
+What percent of registered voters turned out for the 2012 presidential election?
+
+1. 57%
+2. 67%
+3. _77%_
+4. 87%
+5. 97%
+
+*** .hint
+
+Towns with below average turnout were: East Hartford, East Windsor, Enfield, Hartford, Newington and Stafford.  
+
+*** .explanation
+
+77% of registered voters turned out for the 2012 presidential election. 
+
+--- 
+## Voter turnout another measure of civic health
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 14}
+voting <- read.csv('../reviewversion/2012-voting.csv')
+#voting$Town <- gsub(pattern = " (CD1&2)", replacement = "", voting$Town)
+voting <- subset(voting, voting$Town %in% levels(towns$Town))
+
+voting$Town <- reorder(voting$Town, voting$Percentage.Checked.as.Having.Voted)
+
+library(classInt)
+jenks <- classIntervals(voting$Percentage.Checked.as.Having.Voted, 
+                        n=3, style="fisher")
+choropleth=merge(CTTowns, voting, by.x = "id", by.y="Town")
+choropleth=choropleth[order(choropleth$order), ]
+choropleth$Percentage.Checked.as.Having.Voted=
+  cut(choropleth$Percentage.Checked.as.Having.Voted, 
+                          breaks=jenks$brks,
+                          include.lowest=T, dig.lab = T)
+#Make the map
+ggplot(data = choropleth, aes(long, lat, group = group)) +
+  geom_polygon(aes(fill = Percentage.Checked.as.Having.Voted)) + 
+  scale_x_continuous(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = NULL, y = NULL) + 
+  coord_equal() +
+  geom_polygon(data = CTTowns, colour = "grey", alpha = 0.5, fill = NA) +
+  scale_fill_brewer(palette = "Purples", name = "% registered voters\nthat voted") +
+  theme_minimal(base_size = 16)
+```
