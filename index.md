@@ -33,20 +33,10 @@ Jobs
 * Job growth
 
 Quality of life / civic health
+* Home ownership rates
 * Affordable housing
 * Crime rate
 * Voter turnout
-
----
-## Key themes so far
-
-1. 'We are a region'
-2. Concentration of poverty in Hartford
-3. Suburbanization of poverty
-4. Aging population and workforce
-5. Globally connected region
-6. Achievement gap and talent pipeline
-7. Creating opportunity in communities in the region?
 
 ---
 ## Current partners
@@ -62,15 +52,11 @@ Quality of life / civic health
 9. United Way of Central and Northeastern Connecticut
 
 --- &twocol
-## Region: CRCOG towns (Hartford + 29 towns)
+## Defining the region
 
-*** =left
-Urban periphery
-* Bloomfield, East Hartford, Enfield, Manchester, Newington, Rocky Hill, Vernon, West Hartford, Wethersfield, Windsor, Windsor Locks
+CRCOG region as a basis - Hartford + 29 surrounding towns. 
 
-*** =right
-Suburban / rural 
-* Andover, Avon, Bolton, Canton, East Granby, East Windsor, Ellington, Farmington, Glastonbury, Granby, Hebron, Marlborough, Simsbury, Somers, South Windsor, Suffield, Stafford, Tolland
+![plot of chunk unnamed-chunk-1](assets/fig/unnamed-chunk-1.png) 
 
 --- &radio
 
@@ -89,12 +75,12 @@ In 1970, the population of West Hartford was 68,031.
 
 *** .explanation
 
-It has gone from 68K to 63K. The projected population in 2025 is just under 63K.  
+It has gone from 68K to 63K. The projected population through 2025 is just under 63K.  
 
 ---
 ## Low population growth
  
-![plot of chunk unnamed-chunk-1](assets/fig/unnamed-chunk-1.png) 
+![plot of chunk unnamed-chunk-2](assets/fig/unnamed-chunk-2.png) 
 
 
 --- &radio
@@ -117,13 +103,13 @@ During this period, population loss was faster than the increase in poverty. Pov
 --- 
 ## Suburbanization of poverty
 
-![plot of chunk unnamed-chunk-2](assets/fig/unnamed-chunk-2.png) 
+![plot of chunk unnamed-chunk-3](assets/fig/unnamed-chunk-3.png) 
 
 
 ---
 ## Aging population
 
-![plot of chunk unnamed-chunk-3](assets/fig/unnamed-chunk-3.png) 
+![plot of chunk unnamed-chunk-4](assets/fig/unnamed-chunk-4.png) 
 
 
 --- &radio
@@ -144,12 +130,12 @@ This includes charter schools, magnet schools, private and parochial schools, ho
 
 *** .explanation
 
-16% (or 1 in 6) of students in the region attend school outside their home district, either through magnets, charters, open choice, private schools or other alternatives. However, there is substantial variation across the towns in the region.   
+16% (or 1 in 6) of students in the region attend school outside their home district, either through magnets, charters, open choice, private schools or other alternatives. However, there is substantial variation across towns and by grade level, with almost half of students leaving the home district in Bloomfied by high school.   
 
 --- 
-## School enrollment declining
+## School enrollment declining overall
 
-![plot of chunk unnamed-chunk-4](assets/fig/unnamed-chunk-4.png) 
+![plot of chunk unnamed-chunk-5](assets/fig/unnamed-chunk-5.png) 
 
 
 --- &radio
@@ -166,16 +152,16 @@ Which school district has the most languages spoken by its students?
 
 *** .hint
 
-46 languages are spoken in this district (2010-11 data). 
+46 languages are spoken in this district (according to 2010-11 SDE data), although other sources report [higher figures](http://www.hellowesthartford.org). 
 
 *** .explanation
 
-West Hartford has the most languages, followed by Hartford. Hartford has the highest percentage of ELL students though.  
+West Hartford has the most languages, followed by Hartford. Hartford has the highest percentage of ELL students though, followed by East Hartford.  
 
 --- 
 ## A diverse population
 
-![plot of chunk unnamed-chunk-5](assets/fig/unnamed-chunk-5.png) 
+![plot of chunk unnamed-chunk-6](assets/fig/unnamed-chunk-6.png) 
 
 
 --- &radio
@@ -196,13 +182,13 @@ Spanish is the most frequently spoken language.
 
 *** .explanation
 
-The top languages in HPS are: Spanish, Serbo-Croatian (Bosnian), Karen, Albanian, Portuguese and Somali (for all students and ELL students).  
+The top languages in HPS as of 2010-11 (per SDE) are: Spanish, Serbo-Croatian (Bosnian), Karen, Albanian, Portuguese and Somali (for all students and ELL students).  Many of these languages closely track recent refugee arrivals.
 
 --- 
-## Refugee arrivals
+## Refugee arrivals by country of origin
 
 
-![plot of chunk unnamed-chunk-6](assets/fig/unnamed-chunk-6.png) 
+![plot of chunk unnamed-chunk-7](assets/fig/unnamed-chunk-7.png) 
 
 
 --- &radio
@@ -227,14 +213,14 @@ The Center for Education and the Workforce at Georgetown forecasts CT jobs to re
 --- 
 ## Meeting demands for a skilled workforce
 
-![plot of chunk unnamed-chunk-7](assets/fig/unnamed-chunk-7.png) 
+![plot of chunk unnamed-chunk-8](assets/fig/unnamed-chunk-8.png) 
 
 
 
 --- 
 ## Talent pipeline from schools
 
-![plot of chunk unnamed-chunk-8](assets/fig/unnamed-chunk-8.png) 
+![plot of chunk unnamed-chunk-9](assets/fig/unnamed-chunk-9.png) 
 
 
 
@@ -286,7 +272,7 @@ Healthcare and social assistance was the fastest growing; finance and insurance,
 --- 
 ## What kind of jobs are there?
 
-![plot of chunk unnamed-chunk-9](assets/fig/unnamed-chunk-9.png) 
+![plot of chunk unnamed-chunk-10](assets/fig/unnamed-chunk-10.png) 
 
 
 --- &radio
@@ -307,19 +293,19 @@ What percent of ELL students in the region were at or above goal for 3rd grade r
 
 *** .explanation
 
-8.96% of ELL students were at or above goal on 3rd grade reading tests from 2006 - 2011.
+8.96% of ELL students were at or above goal on 3rd grade reading tests for the period 2006 - 2011 for all districts in the region. 
 
 --- 
 ## 3rd grade reading as a milestone
 
-![plot of chunk unnamed-chunk-10](assets/fig/unnamed-chunk-10.png) 
+![plot of chunk unnamed-chunk-11](assets/fig/unnamed-chunk-11.png) 
 
 
 --- &radio
 
 ## Chronic absenteeism ##
 
-Which of the following districts had a chronic absenteeism rate over 10% in 2012?
+Which one of the following districts had a chronic absenteeism rate over 10% in 2012?
 
 1. Bloomfield
 2. East Hartford
@@ -338,7 +324,7 @@ Somers had a rate of 14.3% for 2012.
 --- 
 ## Chronic absenteeism another early warning sign
 
-![plot of chunk unnamed-chunk-11](assets/fig/unnamed-chunk-11.png) 
+![plot of chunk unnamed-chunk-12](assets/fig/unnamed-chunk-12.png) 
 
 
 --- &radio
@@ -354,7 +340,7 @@ Which neighborhood has the highest homeownership rate (owner-occupied housing) i
 
 *** .hint
 
-About 65% of units are owner-occupied in this neighborhood.
+About 65% of units are owner-occupied in this neighborhood; Blue Hills is also high relative to the city average. 
 
 *** .explanation
 
@@ -363,13 +349,13 @@ Southwest has the highest home ownership rate in the city, followed by Blue Hill
 --- 
 ## Home ownership sign of civic health
 
-![plot of chunk unnamed-chunk-12](assets/fig/unnamed-chunk-12.png) 
+![plot of chunk unnamed-chunk-13](assets/fig/unnamed-chunk-13.png) 
 
 
 --- 
 ## Affordable housing stock in the region
 
-![plot of chunk unnamed-chunk-13](assets/fig/unnamed-chunk-13.png) 
+![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14.png) 
 
 
 --- &radio
@@ -394,9 +380,9 @@ It's not Stamford.
 Crime rates have been dropping nationally and have dropped in Hartford in recent years. However, most of the recent decline has been a drop in property crime and violent crime rates have not declined in recent years.
 
 --- 
-## 'Hartford safest in 30 years'
+## Hartford getting safer
 
-![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14.png) 
+![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15.png) 
 
 
 --- &radio
@@ -422,5 +408,5 @@ Towns with below average turnout were: East Hartford, East Windsor, Enfield, Har
 --- 
 ## Voter turnout another measure of civic health
 
-![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15.png) 
+![plot of chunk unnamed-chunk-16](assets/fig/unnamed-chunk-16.png) 
 
